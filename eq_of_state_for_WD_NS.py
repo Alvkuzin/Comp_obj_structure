@@ -73,21 +73,16 @@ def Pres_pne(rho):
                   (m_e**2 + p0(ne)**2)**0.5)**2 - m_n**2)/p0(ne)**2 )**1.5
         np = lambda ne: ne
         nn = lambda ne: ne * n_to_p(ne)
-#    n_to_p = lambda n_e: 100
-#    eta_ = lambda n_e: 1 / n_to_p(n_e)
 
     pf_e = lambda n_e: h_planc/2/pi *(3*pi**2 * n_e)**(1/3)
     x = lambda n_e: pf_e(n_e) / m_e / c_light
     x_n = lambda n_e: h_planc/2/pi *(3*pi**2 * nn(n_e))**(1/3)/m_n/c_light
     x_p = lambda n_e: x(n_e) * m_e / m_p
-#    x_n = lambda n_e: 0
-#    x_p = lambda n_e: 0
     
     Lmbd_n = h_planc/2/pi/m_n/c_light
     P00 = m_n*c_light**2/Lmbd_n**3
     e_ = lambda n_e: P00 * (Chi(x_n(n_e)) + (m_p/m_n)**4 * Chi(x_p(n_e))+ 
      (m_e/m_n)**4 * Chi(x(n_e)) )
-#    e_ = lambda n_e: 0
     if rho > 1e6:
         rho_func = lambda n_e: - rho + e_(n_e)/c_light**2 
         n = brentq(rho_func, 1e20, 1e45)
@@ -100,8 +95,6 @@ def Pres_pne(rho):
         rho_func = lambda n_e: m_e / lmbd_e**3 * Phi(x0(n_e)) + 2*m_p*n_e-rho
         n_e = brentq(rho_func, 1e20, 1e40)
 
-    #    print('x0 in P = ', x0)
-#        Lmbd = h_planc / 2 / pi / m_e / c_light
 #        Pc = -0.3 * (4*pi/3 * Z**2 * n_e**4)**(1/3)*e_e**2
         P_ =  3*m_e * c_light**2 / lmbd_e**3 * Phi(x0(n_e)) #+ Pc
 
@@ -140,45 +133,33 @@ def Pres_AZ(a_here, coul):
     P0n = m_n * c_light**2 / Lmbd_n**3
     P0e = m_e * c_light**2 / lmbd_e**3
     z = lambda a: (b2 / 2 / b5 * a)**0.5  
-#    m_u = lambda a: (m_p * z(a) + m_n * (a - z(a)) ) /a# *1.007276
     m_u = lambda a: m_p / aem
     def x_n(a):
-#        ans1 = (b1 + 2/3 * b2 * a**(-1/3) + b4 * (1/4 - z(a)**2 / a**2) - b5 * z(a)**2 /3 /a**(4/3))*m_u(a)/m_n
         ans1 = ( (b1 + b4/4) + 0.5*b2*a**(-1/3) - b2*b4/2/b5/a)*m_u(a)/m_n#*1.007276
         if ans1 < 1.0:
             return 0
         if ans1 >= 1.0:
-            return (ans1**2 - 1)**0.5
-#    n_n = lambda a: 8*pi/3 * m_n**3*c_light**3/h_planc**3 * x_n(a)**3
-        
+            return (ans1**2 - 1)**0.5      
     def x(a):
         ans2 = (b3 + b4 * (1 - 2 * z(a) / a) - 2 * b5 * z(a) / a**(1/3)) * m_u(a)/m_e#*1.007276
         if ans2 >= 0:
             return (ans2**2 + 2 * ans2)**0.5
         if ans2 < 0:
-#            print('ans2<0, a = ', a_here)
             return 0
     n_e = lambda a: 8 * pi/3 * (m_e * c_light / h_planc * x(a))**3
-#    x_p = lambda a: x(a) * m_e / m_p
     if coul == True:
         Ec = lambda a: -0.9 * (4*pi/3 * z(a)**2 * n_e(a)**4)**(1/3)*e_elec**2
     else:
         Ec = lambda a: 0
     Pc = lambda a: Ec(a)/3
     e_e = lambda a: P0e * Chi(x(a)) - m_e * c_light**2 * n_e(a) + Ec(a)
-#    e_e = lambda a: 0
     e_n = lambda a: P0n * Chi(x_n(a)) 
-#    e_n = lambda a: 0
     
     rho_func = lambda a: (n_e(a) * M(a, z(a))/z(a) + e_e(a) + e_n(a) )/c_light**2
-#    rho_ = rho_func(a)
-#    a_here = brentq(rho_func, 1, 1000)
     P_ = (P0n * Phi(x_n(a_here))  #+ (m_p/m_n)**4 * Phi(x_p(a_here)) 
     + P0e * Phi(x(a_here)) 
     + Pc(a_here) )
-    return P_, rho_func(a_here)
-#    return x(a), x_n(a)
-    
+    return P_, rho_func(a_here)   
 
 """
 Emperical EoS for nuclear matter: e(n)
@@ -187,7 +168,6 @@ def e_emp(n):
     MN = 939.6
     n0 = 0.16 * 1e39
     E0 = 0.3/m_n*(3/16/pi*h_planc**3*n0)**(2/3) /1.602e-6
-#    E0 = 22.1
     BE=-16
     K0 = 250
     sgm = (K0 + 2*E0) / (3* E0 - 9*BE)
@@ -198,16 +178,13 @@ def e_emp(n):
     e_sym = MN + E0*u**(2/3) + A/2*u + B/(1+sgm)*u**sgm
     e_assym = (2**(2/3)-1)*(u**(2/3) - u)*E0 + S0 * u
     return (e_sym + e_assym) * 1.6*1e-6 * n
-#    return (MN + 35.1 * u**(2/3) - 42.1 * u + 21 * u**2.112) * 1.6*1e-6 * n
 
 """
 Emperical EoS for nuclear matter: P(n)
 """
 def Pres_emp(n):
-#    MN = 939.6
     n0 = 0.16 * 1e39
     E0 = 0.3/m_n*(3/16/pi*h_planc**3*n0)**(2/3) /1.602e-6
-#    E0 = 22.1
     BE=-16
     K0 = 250
     sgm = (K0 + 2*E0) / (3* E0 - 9*BE)
@@ -217,9 +194,7 @@ def Pres_emp(n):
     S0 = 30
     de_sym =  2/3*E0*u**(-1/3) + A/2 + sgm*B/(1+sgm)*u**(sgm-1)
     de_assym = (2**(2/3)-1)*(2/3*u**(-1/3) - 1)*E0 + S0
-#    print(A, B, sgm)
     return n**2 * (de_sym + de_assym)/n0* 1.6*1e-6
-#    return n**2 * (2/3 * 35.1*u**(-1/3) - 42.1 + 2.112*21*u**1.112)* 1.6*1e-6/n0
 
 """
 A number of scripts which tabulate a certain EoS
