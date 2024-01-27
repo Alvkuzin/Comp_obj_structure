@@ -18,9 +18,6 @@ import re
 from numpy import pi
 from os import listdir
 import time
-from joblib import Parallel, delayed
-import multiprocessing
-from scipy.integrate import solve_bvp
 start_time = time.time()
 G = 6.67e-8
 c_light = 3e10
